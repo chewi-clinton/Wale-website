@@ -7,27 +7,23 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())  # Allow writing category ID
+    image = serializers.ImageField(use_url=True, allow_null=True)
+
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['id', 'name', 'category', 'description', 'price', 'old_price', 'stock', 'image']
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    product = ProductSerializer(read_only=True)
+
     class Meta:
         model = OrderItem
-        fields = ['product', 'quantity', 'price']
+        fields = ['id', 'product', 'quantity', 'price']
 
 class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True)
-    unique_order_id = serializers.CharField(read_only=True)
+    items = OrderItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'unique_order_id', 'user', 'created_at', 'total_price', 'status', 'email', 'shipping_address', 'items']
-
-    def create(self, validated_data):
-        items_data = validated_data.pop('items')
-        order = Order.objects.create(**validated_data)
-        for item_data in items_data:
-            OrderItem.objects.create(order=order, **item_data)
-        return order
+        fields = ['id', 'user', 'created_at', 'updated_at', 'status', 'total_price', 'items']

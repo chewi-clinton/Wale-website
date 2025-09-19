@@ -8,15 +8,15 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'price', 'stock']
+    list_display = ['name', 'category', 'price', 'old_price', 'stock']
     list_filter = ['category']
     search_fields = ['name', 'description']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['unique_order_id', 'email', 'total_price', 'status', 'created_at']
+    list_display = ['id', 'user', 'status', 'total_price', 'created_at']
     list_filter = ['status', 'created_at']
-    search_fields = ['unique_order_id', 'email', 'shipping_address']
+    search_fields = ['user']
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):

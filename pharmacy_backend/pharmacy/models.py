@@ -1,6 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
-import uuid
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -14,6 +12,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    old_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     stock = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
 
@@ -21,21 +20,20 @@ class Product(models.Model):
         return self.name
 
 class Order(models.Model):
-    unique_order_id = models.CharField(max_length=36, unique=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.CharField(max_length=100, default='anonymous')
     created_at = models.DateTimeField(auto_now_add=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=50, default='Pending')
-    email = models.EmailField()
-    shipping_address = models.TextField()
+    updated_at = models.DateTimeField(auto_now=True)
+    image = models.ImageField(upload_to='orders/', blank=True, null=True)
+    status = models.CharField(max_length=20, default='Pending')
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
-        return f"Order {self.unique_order_id} by {self.user or 'Guest'}"
+        return f"Order {self.id} by {self.user}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
+    quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):

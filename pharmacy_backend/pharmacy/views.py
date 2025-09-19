@@ -1,6 +1,6 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.permissions import IsAdminUser, AllowAny
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import Category, Product, Order
@@ -10,22 +10,43 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            self.permission_classes = [AllowAny]
+        else:
+            self.permission_classes = [IsAdminUser]
+        return super(CategoryViewSet, self).get_permissions()
+
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            self.permission_classes = [AllowAny]
+        else:
+            self.permission_classes = [IsAdminUser]
+        return super(ProductViewSet, self).get_permissions()
+
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
+    queryset = Order.objects.all().order_by('-created_at')
     serializer_class = OrderSerializer
+
+    def get_permissions(self):
+        if self.action == 'create':
+            self.permission_classes = [AllowAny]
+        else:
+            self.permission_classes = [IsAdminUser]
+        return super(OrderViewSet, self).get_permissions()
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         order = serializer.save()
-
+        
         items = order.items.all()
         item_details = "\n".join([f"{item.quantity} x {item.product.name} - ${item.price}" for item in items])
-
+        
         send_mail(
             subject=f'Order Confirmation - Order {order.unique_order_id}',
             message=(
@@ -40,7 +61,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             recipient_list=[order.email],
             fail_silently=False,
         )
-
+        
         send_mail(
             subject=f'New Order Notification - Order {order.unique_order_id}',
             message=(
@@ -55,5 +76,5 @@ class OrderViewSet(viewsets.ModelViewSet):
             recipient_list=[settings.ADMIN_EMAIL],
             fail_silently=False,
         )
-
+        
         return Response(serializer.data, status=status.HTTP_201_CREATED)
