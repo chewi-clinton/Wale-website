@@ -1,3 +1,4 @@
+# pharmacy/views.py
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, AllowAny
@@ -31,13 +32,19 @@ class ProductViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().order_by('-created_at')
     serializer_class = OrderSerializer
+    lookup_field = 'unique_order_id'  # Use unique_order_id instead of id for lookups
 
     def get_permissions(self):
-        if self.action == 'create':
+        if self.action in ['create', 'retrieve']:
             self.permission_classes = [AllowAny]
         else:
             self.permission_classes = [IsAdminUser]
         return super(OrderViewSet, self).get_permissions()
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

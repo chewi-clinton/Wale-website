@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+import uuid
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -15,20 +17,30 @@ class Product(models.Model):
     old_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     stock = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
 
 class Order(models.Model):
-    user = models.CharField(max_length=100, default='anonymous')
+    unique_order_id = models.CharField(max_length=20, unique=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
+    email = models.EmailField()
+    shipping_address = models.TextField()
+    payment_method = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    image = models.ImageField(upload_to='orders/', blank=True, null=True)
     status = models.CharField(max_length=20, default='Pending')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
+    def save(self, *args, **kwargs):
+        if not self.unique_order_id:
+            self.unique_order_id = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"Order {self.id} by {self.user}"
+        return f"Order {self.unique_order_id} by {self.user if self.user else self.email}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
