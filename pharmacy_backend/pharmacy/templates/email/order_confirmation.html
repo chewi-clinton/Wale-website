@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Confirmation - TRIMAXA PHARMACY</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background-color: #031e4d;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 300;
+        letter-spacing: 2px;
+      }
+      .content {
+        padding: 30px;
+      }
+      .order-info {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+      .order-info h2 {
+        margin-top: 0;
+        color: #031e4d;
+        font-size: 20px;
+        font-weight: 500;
+      }
+      .order-details {
+        margin-bottom: 20px;
+      }
+      .order-details p {
+        margin: 8px 0;
+        font-size: 16px;
+      }
+      .order-details strong {
+        color: #031e4d;
+      }
+      .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      .items-table th {
+        background-color: #031e4d;
+        color: white;
+        text-align: left;
+        padding: 12px;
+        font-weight: 500;
+      }
+      .items-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+      .items-table tr:last-child td {
+        border-bottom: none;
+      }
+      .footer {
+        background-color: #f8f9fa;
+        padding: 20px;
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+      }
+      .footer p {
+        margin: 5px 0;
+      }
+      .cta-button {
+        display: inline-block;
+        background-color: #031e4d;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 500;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>TRIMAXA PHARMACY</h1>
+      </div>
+      <div class="content">
+        <div class="order-info">
+          <h2>Order Confirmation</h2>
+          <p>
+            Thank you for your order! We've received your order and will process
+            it shortly.
+          </p>
+        </div>
+
+        <div class="order-details">
+          <p><strong>Order ID:</strong> {{order_id}}</p>
+          <p><strong>Date:</strong> {{date}}</p>
+          <p><strong>Email:</strong> {{email}}</p>
+          <p><strong>Shipping Address:</strong> {{shipping_address}}</p>
+          <p><strong>Payment Method:</strong> {{payment_method}}</p>
+          <p><strong>Total:</strong> ${{total_price}}</p>
+        </div>
+
+        <h3>Order Items</h3>
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>{{item.name}}</td>
+              <td>{{item.quantity}}</td>
+              <td>${{item.price}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <p>
+          We'll send you another email with payment instructions shortly. If you
+          have any questions about your order, please contact our customer
+          service team.
+        </p>
+      </div>
+      <div class="footer">
+        <p>TRIMAXA PHARMACY</p>
+        <p>Email: dr@trimaxapharmacy.com</p>
+        <p>Phone: +1-409-209-9501</p>
+        <p>© {{year}} TRIMAXA PHARMACY. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

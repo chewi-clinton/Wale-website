@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Order Notification - TRIMAXA PHARMACY</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        color: #333;
+      }
+      .container {
+        max-width: 700px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background-color: #031e4d;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 300;
+        letter-spacing: 2px;
+      }
+      .content {
+        padding: 30px;
+      }
+      .alert {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-weight: 500;
+      }
+      .order-info {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+      .order-info h2 {
+        margin-top: 0;
+        color: #031e4d;
+        font-size: 20px;
+        font-weight: 500;
+      }
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .info-box {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+      }
+      .info-box h3 {
+        margin-top: 0;
+        color: #031e4d;
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+      .info-box p {
+        margin: 5px 0;
+        font-size: 14px;
+      }
+      .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      .items-table th {
+        background-color: #031e4d;
+        color: white;
+        text-align: left;
+        padding: 12px;
+        font-weight: 500;
+      }
+      .items-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+      .items-table tr:last-child td {
+        border-bottom: none;
+      }
+      .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 500;
+        text-align: center;
+      }
+      .btn-primary {
+        background-color: #031e4d;
+        color: white;
+      }
+      .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+      }
+      .footer {
+        background-color: #f8f9fa;
+        padding: 20px;
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+      }
+      .footer p {
+        margin: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>TRIMAXA PHARMACY ADMIN</h1>
+      </div>
+      <div class="content">
+        <div class="alert">New Order Received: {{order_id}}</div>
+
+        <div class="order-info">
+          <h2>Order Details</h2>
+          <p>A new order has been placed and requires your attention.</p>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-box">
+            <h3>Customer Information</h3>
+            <p><strong>Name:</strong> {{customer_name}}</p>
+            <p><strong>Email:</strong> {{email}}</p>
+            <p><strong>Phone:</strong> {{phone}}</p>
+          </div>
+          <div class="info-box">
+            <h3>Order Information</h3>
+            <p><strong>Order ID:</strong> {{order_id}}</p>
+            <p><strong>Date:</strong> {{date}}</p>
+            <p><strong>Payment Method:</strong> {{payment_method}}</p>
+            <p><strong>Total:</strong> ${{total_price}}</p>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <h3>Shipping Address</h3>
+          <p>{{shipping_address}}</p>
+        </div>
+
+        <h3>Order Items</h3>
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Product ID</th>
+              <th>Product Name</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>{{item.id}}</td>
+              <td>{{item.name}}</td>
+              <td>{{item.quantity}}</td>
+              <td>${{item.price}}</td>
+              <td>${{item.total}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="action-buttons">
+          <a href="#" class="btn btn-primary">View Order Details</a>
+          <a href="#" class="btn btn-secondary">Contact Customer</a>
+        </div>
+      </div>
+      <div class="footer">
+        <p>TRIMAXA PHARMACY ADMIN</p>
+        <p>
+          This is an automated notification. Please do not reply to this email.
+        </p>
+        <p>© {{year}} TRIMAXA PHARMACY. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

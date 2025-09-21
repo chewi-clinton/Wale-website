@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Category, Product, Order, OrderItem
+from .models import Category, Product, ProductVariant, Order, OrderItem
+
+class ProductVariantInline(admin.TabularInline):
+    model = ProductVariant
+    extra = 5
+    min_num = 1
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -8,9 +13,16 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'price', 'old_price', 'stock']
+    list_display = ['name', 'category']
     list_filter = ['category']
     search_fields = ['name', 'description']
+    inlines = [ProductVariantInline]
+
+@admin.register(ProductVariant)
+class ProductVariantAdmin(admin.ModelAdmin):
+    list_display = ['product', 'name', 'price', 'stock']
+    list_filter = ['product']
+    search_fields = ['product__name', 'name']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
@@ -20,5 +32,5 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ['order', 'product', 'quantity', 'price']
-    search_fields = ['product__name']
+    list_display = ['order', 'product', 'variant', 'quantity', 'price']
+    search_fields = ['product__name', 'variant__name']
