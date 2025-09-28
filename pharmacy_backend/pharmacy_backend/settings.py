@@ -1,3 +1,4 @@
+
 from pathlib import Path
 from decouple import config
 import os
@@ -22,7 +23,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'pharmacy',
 ]
+
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -38,6 +41,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://trimaxapharmacy.com",
     "https://backend.trimaxapharmacy.com",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://backend.trimaxapharmacy.com',
+    'https://trimaxapharmacy.com',
+    'http://localhost:5173',
 ]
 
 REST_FRAMEWORK = {
@@ -76,7 +85,6 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='dr@trimaxapharmacy.com')
 ADMIN_EMAIL = config('ADMIN_EMAIL', default='trimaxaa@gmail.com')
 RESEND_API_KEY = config('RESEND_API_KEY', default='')
-
 
 LOGGING = {
     'version': 1,
