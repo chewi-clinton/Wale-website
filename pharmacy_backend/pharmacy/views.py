@@ -9,7 +9,6 @@ from .models import Category, Product, Order, ProductVariant
 from .serializers import CategorySerializer, ProductSerializer, OrderSerializer, ProductVariantSerializer
 
 logger = logging.getLogger(__name__)
-
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -148,3 +147,54 @@ class OrderViewSet(viewsets.ModelViewSet):
             logger.error(f"Failed to send admin email for order {order.unique_order_id}: {str(e)}")
         
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class PrescriptionRequestViewSet(viewsets.ViewSet):
+    permission_classes = [AllowAny]
+
+    def create(self, request):
+        data = request.data
+        form_type = data.get('form_type', '')
+        
+        try:
+            context = {
+                'name': data.get('name', ''),
+                'email': data.get('email', ''),
+                'phone': data.get('phone', ''),
+                'date_of_birth': data.get('dateOfBirth', ''),
+                'gender': data.get('gender', ''),
+                'age': data.get('age', ''),
+                'address': data.get('address', ''),
+                'state': data.get('state', ''),
+                'zip_code': data.get('zipCode', ''),
+                'pharmacy_info': data.get('pharmacyInfo', ''),
+                'medication_name': data.get('medicationName', ''),
+                'medication_needed': data.get('medicationNeeded', ''),
+                'dosage_needed': data.get('dosageNeeded', ''),
+                'duration': data.get('duration', ''),
+                'has_prescription': data.get('hasPrescription', ''),
+                'no_prescription': data.get('noPrescription', False),
+                'past_medical_problems': data.get('pastMedicalProblems', ''),
+                'current_medications': data.get('currentMedications', ''),
+                'known_allergies': data.get('knownAllergies', ''),
+                'thyroid_cancer': data.get('thyroidCancer', False),
+                'men_syndrome': data.get('menSyndrome', False),
+                'glp1_allergy': data.get('glp1Allergy', False),
+                'agree_to_terms': data.get('agreeToTerms', False),
+            }
+            
+            context = {k: v for k, v in context.items() if v}
+            
+            html_message = render_to_string('email/prescription_notification.html', context)
+            send_mail(
+                subject=f'New Prescription Request - {form_type.title()} Form',
+                message=f'A new {form_type} prescription request has been submitted.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.ADMIN_EMAIL],
+                fail_silently=False,
+                html_message=html_message
+            )
+            logger.info(f"Prescription notification email sent for {form_type} form by {data.get('email', 'Unknown')}")
+        except Exception as e:
+            logger.error(f"Failed to send prescription notification email: {str(e)}")
+        
+        return Response({"status": "success"}, status=status.HTTP_201_CREATED)
