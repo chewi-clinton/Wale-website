@@ -10,7 +10,7 @@ services:
       - DB_NAME=pharmacy_db
       - DB_USER=yxngac
       - DB_PASSWORD=clinton
-      - DB_HOST=django_db
+      - DB_HOST=db
       - DB_PORT=5432
 
     ports:
