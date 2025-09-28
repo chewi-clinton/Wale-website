@@ -1,0 +1,33 @@
+services:
+  web:
+    build: .
+    container_name: backend
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - DB_NAME=pharmacy_db
+      - DB_USER=yxngac
+      - DB_PASSWORD=clinton
+      - DB_HOST=django_db
+      - DB_PORT=5432
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17
+    container_name: django_db
+    environment:
+      - POSTGRES_DB=pharmacy_db
+      - POSTGRES_USER=yxngac
+      - POSTGRES_PASSWORD=clinton
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+volumes:
+  postgres_data:
