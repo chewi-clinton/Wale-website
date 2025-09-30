@@ -1,3 +1,4 @@
+# views.py
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, AllowAny
@@ -9,6 +10,7 @@ from .models import Category, Product, Order, ProductVariant
 from .serializers import CategorySerializer, ProductSerializer, OrderSerializer, ProductVariantSerializer
 
 logger = logging.getLogger(__name__)
+
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -102,6 +104,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             'date': order.created_at.strftime('%Y-%m-%d %H:%M'),
             'email': order.email,
             'shipping_address': order.shipping_address,
+            'phone': order.phone or 'Not provided',
             'payment_method': order.payment_method,
             'total_price': order.total_price,
             'items': [
@@ -114,7 +117,6 @@ class OrderViewSet(viewsets.ModelViewSet):
                 } for item in items
             ],
             'customer_name': f"{order.user.first_name} {order.user.last_name}" if order.user else "Guest",
-            'phone': getattr(order.user, 'phone', 'Not provided'),
             'year': order.created_at.year
         }
         

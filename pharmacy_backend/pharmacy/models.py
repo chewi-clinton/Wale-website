@@ -1,4 +1,4 @@
-# pharmacy/models.py
+# models.py
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
@@ -37,6 +37,7 @@ class Order(models.Model):
     unique_order_id = models.CharField(max_length=20, unique=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True, null=True)
     shipping_address = models.TextField()
     payment_method = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)

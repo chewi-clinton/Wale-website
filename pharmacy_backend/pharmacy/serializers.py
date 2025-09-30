@@ -1,3 +1,4 @@
+# serializers.py
 from rest_framework import serializers
 from .models import Category, Product, ProductVariant, Order, OrderItem
 
@@ -35,7 +36,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
-            'id', 'unique_order_id', 'email', 'shipping_address', 
+            'id', 'unique_order_id', 'email', 'phone', 'shipping_address', 
             'total_price', 'payment_method', 'status', 'created_at', 'items'
         ]
         read_only_fields = ['id', 'unique_order_id', 'created_at', 'status']
