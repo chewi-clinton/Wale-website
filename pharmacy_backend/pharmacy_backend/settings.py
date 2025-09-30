@@ -30,7 +30,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',  # Disabled for API-only with JWT
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -57,6 +57,7 @@ REST_FRAMEWORK = {
     ],
     'UNAUTHENTICATED_USER': None,
 }
+
 from datetime import timedelta
 
 SIMPLE_JWT = {
@@ -135,3 +136,4 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ROOT_URLCONF = 'pharmacy_backend.urls'
+WSGI_APPLICATION = 'pharmacy_backend.wsgi.application'
