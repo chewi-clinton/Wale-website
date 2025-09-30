@@ -1,3 +1,4 @@
+# settings.py
 from pathlib import Path
 from decouple import config
 import os
@@ -42,6 +43,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://backend.trimaxapharmacy.com",
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
 CSRF_TRUSTED_ORIGINS = [
     'https://backend.trimaxapharmacy.com',
     'https://trimaxapharmacy.com',
@@ -54,6 +57,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
 }
 
@@ -62,6 +66,8 @@ from datetime import timedelta
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
 }
 
 DATABASES = {
