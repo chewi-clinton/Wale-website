@@ -39,4 +39,4 @@ HEALTHCHECK --interval=30s --timeout=3s \
     CMD curl -f http://localhost:8000/health/ || exit 1
 
 # Run migrations and start Gunicorn
-CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 pharmacy_backend.wsgi:application --workers 1 --timeout 90"]
+CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 --worker-tmp-dir /dev/shm pharmacy_backend.wsgi:application --workers 1 --timeout 120 --max-requests 1000"]
