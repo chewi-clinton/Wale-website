@@ -32,11 +32,11 @@ USER appuser
 RUN python manage.py collectstatic --noinput
 
 # Expose the port the app runs on
-EXPOSE 8001
+EXPOSE 8000
 
 # Healthcheck to ensure the application is running
 HEALTHCHECK --interval=30s --timeout=3s \
-    CMD curl -f http://localhost:8001/health/ || exit 1
+    CMD curl -f http://localhost:8000/health/ || exit 1
 
 # Run migrations and start Gunicorn
-CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:8001 pharmacy_backend.wsgi:application --workers 1 --timeout 90"]
+CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 pharmacy_backend.wsgi:application --workers 1 --timeout 90"]
