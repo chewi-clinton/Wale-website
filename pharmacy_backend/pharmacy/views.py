@@ -24,7 +24,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    # ADDED: Filter backends and ordering
+ 
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['name', 'created_at', 'is_popular']
     ordering = ['-is_popular', 'name']  # Default ordering: popular first, then by name
