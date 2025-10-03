@@ -1,5 +1,4 @@
-# views.py
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, AllowAny
 from django.core.mail import send_mail
@@ -25,6 +24,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    # ADDED: Filter backends and ordering
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['name', 'created_at', 'is_popular']
+    ordering = ['-is_popular', 'name']  # Default ordering: popular first, then by name
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -86,6 +89,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         else:
             self.permission_classes = [IsAdminUser]
         return super(OrderViewSet, self).get_permissions()
+    
+    def get_authenticators(self):
+        if self.action == 'create':
+            return []
+        return super().get_authenticators()
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -152,6 +160,9 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 class PrescriptionRequestViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
+    
+    def get_authenticators(self):
+        return []
 
     def create(self, request):
         data = request.data

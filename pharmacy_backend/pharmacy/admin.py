@@ -13,10 +13,18 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category']
-    list_filter = ['category']
+    list_display = ['name', 'category', 'is_popular']  # ADDED: is_popular
+    list_filter = ['category', 'is_popular']  # ADDED: is_popular
     search_fields = ['name', 'description']
     inlines = [ProductVariantInline]
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'category', 'description', 'image')
+        }),
+        ('Popularity', {  # ADDED: Popularity section
+            'fields': ('is_popular',)
+        }),
+    )
 
 @admin.register(ProductVariant)
 class ProductVariantAdmin(admin.ModelAdmin):
