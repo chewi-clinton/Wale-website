@@ -26,7 +26,7 @@ services:
 
   npm_db:
     image: mariadb:latest
-    container_name: npm_db
+    container_name: npm-db
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=root_password
