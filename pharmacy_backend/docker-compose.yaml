@@ -1,28 +1,42 @@
 version: "3.8"
 
 services:
-  traefik:
-    image: traefik:v3.1
-    container_name: traefik
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx_proxy_manager
     restart: always
     ports:
-      - "80:80"
-      - "443:443"
+      - "80:80"    # HTTP
+      - "443:443"  # HTTPS
+      - "81:81"    # Admin Web Interface
+    environment:
+      - DB_MYSQL_HOST=db
+      - DB_MYSQL_PORT=3306
+      - DB_MYSQL_USER=npm
+      - DB_MYSQL_PASSWORD=npm_password
+      - DB_MYSQL_NAME=npm
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./letsencrypt:/letsencrypt
-    command:
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=you@example.com" # change
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
     networks:
-      - traefik_default
+      - proxy_default
+      - backend_default
+    depends_on:
+      - npm_db
+
+  npm_db:
+    image: mariadb:latest
+    container_name: npm_db
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=npm
+      - MYSQL_USER=npm
+      - MYSQL_PASSWORD=npm_password
+    volumes:
+      - npm_db_data:/var/lib/mysql
+    networks:
+      - backend_default
 
   web:
     build: .
@@ -35,21 +49,13 @@ services:
       - DB_PASSWORD=clinton
       - DB_HOST=db
       - DB_PORT=5432
-    ports:
-      - "91.98.150.156:8080:8000" # direct test on server IP
     expose:
-      - "8000" # exposed to Traefik
+      - "8000" # Exposed to Nginx Proxy Manager
     depends_on:
       - db
     command: python manage.py runserver 0.0.0.0:8000
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`backend.trimaxapharmacy.com`)"
-      - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend.tls.certresolver=myresolver"
-      - "traefik.http.services.backend.loadbalancer.server.port=8000"
     networks:
-      - traefik_default
+      - proxy_default
       - backend_default
 
   db:
@@ -66,10 +72,12 @@ services:
 
 volumes:
   postgres_data:
-  letsencrypt:
+  npm_data:
+  npm_letsencrypt:
+  npm_db_data:
 
 networks:
   backend_default:
     driver: bridge
-  traefik_default:
-    external: true
+  proxy_default:
+    driver: bridge
