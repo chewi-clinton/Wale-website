@@ -8,7 +8,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-default-key-for-dev')
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', "backend.trimaxapharmacy.com", "trimaxapharmacy.com"]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', "backend.trimaxapharmacy.com", "trimaxapharmacy.com","91.98.150.156"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -47,6 +47,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://backend.trimaxapharmacy.com',
     'https://trimaxapharmacy.com',
     'http://localhost:5173',
+    "http://91.98.150.156:8080"
+    
 ]
 
 REST_FRAMEWORK = {
