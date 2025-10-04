@@ -40,6 +40,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://trimaxapharmacy.com",
     "https://backend.trimaxapharmacy.com",
+    "http://91.98.150.156:8080"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
