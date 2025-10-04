@@ -1,23 +1,56 @@
+version: "3.8"
+
 services:
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=you@example.com" # change
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    networks:
+      - traefik_default
+
   web:
     build: .
     container_name: backend
     volumes:
       - .:/app
-    env_file:
-      - .env
     environment:
       - DB_NAME=pharmacy_db
       - DB_USER=yxngac
       - DB_PASSWORD=clinton
       - DB_HOST=db
       - DB_PORT=5432
-
     ports:
-      - "8000:8000"
-
+      - "91.98.150.156:8080:8000" # direct test on server IP
+    expose:
+      - "8000" # exposed to Traefik
     depends_on:
       - db
+    command: python manage.py runserver 0.0.0.0:8000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`backend.trimaxapharmacy.com`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+    networks:
+      - traefik_default
+      - backend_default
 
   db:
     image: postgres:17
@@ -28,6 +61,15 @@ services:
       - POSTGRES_PASSWORD=clinton
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - backend_default
 
 volumes:
   postgres_data:
+  letsencrypt:
+
+networks:
+  backend_default:
+    driver: bridge
+  traefik_default:
+    external: true
