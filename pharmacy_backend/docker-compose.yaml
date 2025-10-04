@@ -5,12 +5,13 @@ services:
     image: jc21/nginx-proxy-manager:latest
     container_name: nginx_proxy_manager
     restart: always
+    # Bind ports ONLY to Tailscale interface IP (replace with your own Tailscale IP)
     ports:
-      - "80:80"    # HTTP
-      - "443:443"  # HTTPS
-      - "81:81"    # Admin Web Interface
+      - "100.110.107.122:80:80" # HTTP (Tailscale only)
+      - "100.110.107.122:443:443" # HTTPS (Tailscale only)
+      - "100.110.107.122:81:81" # Admin Web Interface (Tailscale only)
     environment:
-      - DB_MYSQL_HOST=db
+      - DB_MYSQL_HOST=npm_db
       - DB_MYSQL_PORT=3306
       - DB_MYSQL_USER=npm
       - DB_MYSQL_PASSWORD=npm_password
@@ -26,7 +27,7 @@ services:
 
   npm_db:
     image: mariadb:latest
-    container_name: npm-db
+    container_name: npm_db
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=root_password
@@ -41,6 +42,7 @@ services:
   web:
     build: .
     container_name: backend
+    restart: always
     volumes:
       - .:/app
     environment:
@@ -50,7 +52,7 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
     expose:
-      - "8000" # Exposed to Nginx Proxy Manager
+      - "8000" # exposed to NPM reverse proxy
     depends_on:
       - db
     command: python manage.py runserver 0.0.0.0:8000
@@ -61,6 +63,7 @@ services:
   db:
     image: postgres:17
     container_name: django_db
+    restart: always
     environment:
       - POSTGRES_DB=pharmacy_db
       - POSTGRES_USER=yxngac
