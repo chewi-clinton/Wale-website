@@ -9,9 +9,14 @@ services:
     container_name: nginx_proxy_manager
     restart: always
     ports:
-      - "100.110.107.122:80:80" # HTTP via Tailscale
-      - "100.110.107.122:443:443" # HTTPS via Tailscale
-      - "100.110.107.122:81:81" # Admin UI via Tailscale
+      # Public Access
+      - "91.98.150.156:80:80" # HTTP via Public IP
+      - "91.98.150.156:443:443" # HTTPS via Public IP
+      - "91.98.150.156:81:81" # Admin UI via Public IP
+      # Private Access (Tailscale)
+      - "100.110.107.122:80:80"
+      - "100.110.107.122:443:443"
+      - "100.110.107.122:81:81"
     environment:
       DB_MYSQL_HOST: npm_db
       DB_MYSQL_PORT: 3306
@@ -62,7 +67,7 @@ services:
       DB_PORT: 5432
       PYTHONUNBUFFERED: 1
     expose:
-      - "8000" # only exposed internally to proxy
+      - "8000" # only exposed internally to NPM
     depends_on:
       - db
     networks:
