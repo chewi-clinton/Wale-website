@@ -150,5 +150,3 @@ SECURE_HSTS_PRELOAD = True
 
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-ALLOWED_HOSTS = ['backend.trimaxapharmacy.com', 'www.backend.trimaxapharmacy.com']
