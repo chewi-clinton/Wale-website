@@ -1,86 +1,104 @@
 version: "3.8"
 
 services:
+  # ─────────────────────────────
+  # NGINX PROXY MANAGER
+  # ─────────────────────────────
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:latest
     container_name: nginx_proxy_manager
     restart: always
-    # Bind ports ONLY to Tailscale interface IP (replace with your own Tailscale IP)
     ports:
-      - "100.110.107.122:80:80" # HTTP (Tailscale only)
-      - "100.110.107.122:443:443" # HTTPS (Tailscale only)
-      - "100.110.107.122:81:81" # Admin Web Interface (Tailscale only)
+      - "100.110.107.122:80:80" # HTTP via Tailscale
+      - "100.110.107.122:443:443" # HTTPS via Tailscale
+      - "100.110.107.122:81:81" # Admin UI via Tailscale
     environment:
-      - DB_MYSQL_HOST=npm_db
-      - DB_MYSQL_PORT=3306
-      - DB_MYSQL_USER=npm
-      - DB_MYSQL_PASSWORD=npm_password
-      - DB_MYSQL_NAME=npm
+      DB_MYSQL_HOST: npm_db
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: npm
+      DB_MYSQL_PASSWORD: npm_password
+      DB_MYSQL_NAME: npm
     volumes:
       - npm_data:/data
       - npm_letsencrypt:/etc/letsencrypt
-    networks:
-      - proxy_default
-      - backend_default
     depends_on:
       - npm_db
+    networks:
+      - proxy_net
+      - backend_net
 
+  # ─────────────────────────────
+  # NGINX PROXY MANAGER DATABASE
+  # ─────────────────────────────
   npm_db:
     image: mariadb:latest
     container_name: npm_db
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=root_password
-      - MYSQL_DATABASE=npm
-      - MYSQL_USER=npm
-      - MYSQL_PASSWORD=npm_password
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: npm
+      MYSQL_USER: npm
+      MYSQL_PASSWORD: npm_password
     volumes:
       - npm_db_data:/var/lib/mysql
     networks:
-      - backend_default
+      - backend_net
 
+  # ─────────────────────────────
+  # DJANGO BACKEND SERVICE
+  # ─────────────────────────────
   web:
     build: .
-    container_name: backend
+    container_name: django_backend
     restart: always
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
     environment:
-      - DB_NAME=pharmacy_db
-      - DB_USER=yxngac
-      - DB_PASSWORD=clinton
-      - DB_HOST=db
-      - DB_PORT=5432
+      DB_NAME: pharmacy_db
+      DB_USER: yxngac
+      DB_PASSWORD: clinton
+      DB_HOST: db
+      DB_PORT: 5432
+      PYTHONUNBUFFERED: 1
     expose:
-      - "8000" # exposed to NPM reverse proxy
+      - "8000" # only exposed internally to proxy
     depends_on:
       - db
-    command: python manage.py runserver 0.0.0.0:8000
     networks:
-      - proxy_default
-      - backend_default
+      - proxy_net
+      - backend_net
 
+  # ─────────────────────────────
+  # POSTGRES DATABASE
+  # ─────────────────────────────
   db:
     image: postgres:17
     container_name: django_db
     restart: always
     environment:
-      - POSTGRES_DB=pharmacy_db
-      - POSTGRES_USER=yxngac
-      - POSTGRES_PASSWORD=clinton
+      POSTGRES_DB: pharmacy_db
+      POSTGRES_USER: yxngac
+      POSTGRES_PASSWORD: clinton
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/data
     networks:
-      - backend_default
+      - backend_net
 
+# ─────────────────────────────
+# VOLUMES
+# ─────────────────────────────
 volumes:
   postgres_data:
   npm_data:
   npm_letsencrypt:
   npm_db_data:
 
+# ─────────────────────────────
+# NETWORKS
+# ─────────────────────────────
 networks:
-  backend_default:
+  proxy_net:
     driver: bridge
-  proxy_default:
+  backend_net:
     driver: bridge
