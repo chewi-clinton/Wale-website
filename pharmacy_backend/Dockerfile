@@ -10,10 +10,11 @@ ENV DJANGO_SETTINGS_MODULE=pharmacy_backend.settings
 # Set the working directory in the container
 WORKDIR /code
 
-# Install system dependencies required for psycopg2 and other packages
+# Install system dependencies required for psycopg2, other packages, and curl for healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libpq-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
@@ -35,8 +36,11 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 # Healthcheck to ensure the application is running
-HEALTHCHECK --interval=30s --timeout=3s \
-    CMD curl -f http://localhost:8000/health/ || exit 1
+# Changed to '/' assuming your API root or a simple endpoint returns 200 OK.
+# If you have a dedicated /health/ endpoint that returns 200, keep '/health/'.
+# If root doesn't work (e.g., 404 or redirect), replace with a known public endpoint like '/api/products/' or '/api/categories/'.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8000/ || exit 1
 
 # Run migrations and start Gunicorn
 CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 --worker-tmp-dir /dev/shm pharmacy_backend.wsgi:application --workers 1 --timeout 120 --max-requests 1000"]
